@@ -1,0 +1,63 @@
+# Example systemd unit for lymphd.
+#
+# Lymph is a local control plane, so it runs as an ordinary service user with
+# write access to its store and read access to nothing else. It is not started
+# as root and it does not need to be: in this build it never writes to a managed
+# deployment target at all (see docs/IMPLEMENTATION-STATUS.md, stage L3).
+#
+#   sudo install -d -o lymph -g lymph -m 0750 /var/lib/lymph
+#   sudo install -m 0644 deploy/lymph.service /etc/systemd/system/lymph.service
+#   sudo systemctl enable --now lymph
+#
+# socket: /run/lymph/lymph.sock, mode 0660, so members of the group may emit
+# events and only they may query the control plane.
+
+[Unit]
+Description=Lymph configuration governance daemon
+Documentation=file:/opt/lymph/docs/IMPLEMENTATION-STATUS.md
+After=network.target
+
+[Service]
+Type=simple
+User=lymph
+Group=lymph
+ExecStart=/opt/lymph/bin/lymphd --root /var/lib/lymph --socket /run/lymph/lymph.sock --acl /etc/lymph/acl.json --require-acl
+Restart=on-failure
+RestartSec=2
+UMask=0027
+
+# The socket directory must exist before the daemon starts.
+RuntimeDirectory=lymph
+RuntimeDirectoryMode=0750
+
+StateDirectory=lymph
+StateDirectoryMode=0750
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+PrivateNetwork=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProcSubset=pid
+ReadWritePaths=/var/lib/lymph
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+RemoveIPC=true
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

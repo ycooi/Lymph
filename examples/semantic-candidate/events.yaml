@@ -1,0 +1,21 @@
+# Synthetic proposed revision: adds a previously unknown phrase.
+version: 3
+rules:
+  - id: awarded-implies-buyer
+    phrase: "awarded"
+    state: AWARDED
+    qualifiers:
+      actor_role: buyer
+      confidence: 0.8
+  - id: tender-open
+    phrase: "invites bids"
+    state: TENDER_OPEN
+    qualifiers:
+      actor_role: buyer
+      confidence: 0.7
+  - id: booked-phrase
+    phrase: "business was booked"
+    state: AWARDED
+    qualifiers:
+      actor_role: buyer
+      confidence: 0.6

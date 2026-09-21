@@ -1,0 +1,15 @@
+bin/
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.lymph-spool/
+*.log
+coverage.out
+*.prof
+lab/testdata/fuzz/
+lab/REPORT.md
+lab/report.json

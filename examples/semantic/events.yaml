@@ -1,0 +1,19 @@
+# SemanticService semantic event rules — as found on disk when Lymph first joined.
+#
+# This file is a synthetic fixture. It stands in for an application configuration so the smoke
+# test can exercise bootstrap import (section 27) without touching any
+# production path.
+version: 3
+rules:
+  - id: awarded-implies-buyer
+    phrase: "awarded"
+    state: AWARDED
+    qualifiers:
+      actor_role: buyer
+      confidence: 0.8
+  - id: tender-open
+    phrase: "invites bids"
+    state: TENDER_OPEN
+    qualifiers:
+      actor_role: buyer
+      confidence: 0.7

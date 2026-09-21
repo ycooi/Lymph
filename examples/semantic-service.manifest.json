@@ -1,0 +1,68 @@
+{
+  "name": "semantic-service",
+  "type": "mcp-server",
+  "owner": "operator",
+  "repository": "example/semantic-service",
+  "junctions": [
+    {
+      "name": "semantic.event_state",
+      "improvement_workflow": "semantic-rule-repair",
+      "config_family": "semantic_event_rules",
+      "feedback_types": ["UNKNOWN", "AMBIGUOUS", "CONFLICT", "HUMAN_CORRECTION"],
+      "replay_adapter": "semantic-service.semantic.replay.v1"
+    },
+    {
+      "name": "entity.alias",
+      "improvement_workflow": "entity-alias-review",
+      "config_family": "entity_aliases"
+    },
+    {
+      "name": "retrieval.candidate_generation",
+      "improvement_workflow": "retrieval-investigation",
+      "config_family": "retrieval_profile"
+    }
+  ],
+  "config_families": [
+    {
+      "name": "semantic_event_rules",
+      "schema_revision": "semantic-rules-v3",
+      "workflow_type": "semantic-rule-repair",
+      "targets": [
+        {
+          "target_type": "SINGLE_FILE",
+          "path": "/etc/semantic-service/semantic/events.yaml",
+          "reload_policy": "SIGHUP",
+          "atomicity": "FULL",
+          "health": "{\"method\":\"HTTP_RELOAD\",\"endpoint\":\"http://127.0.0.1:8080/config\",\"field\":\"loaded_config_revision\"}"
+        }
+      ]
+    },
+    {
+      "name": "entity_aliases",
+      "schema_revision": "alias-rules-v1",
+      "workflow_type": "entity-alias-review",
+      "targets": [
+        {
+          "target_type": "DIRECTORY",
+          "path": "/etc/semantic-service/aliases/",
+          "reload_policy": "WATCH_FILE",
+          "atomicity": "FULL"
+        }
+      ]
+    },
+    {
+      "name": "retrieval_profile",
+      "schema_revision": "retrieval-profile-v2",
+      "workflow_type": "retrieval-investigation",
+      "requires_holdout": true,
+      "targets": [
+        {
+          "target_type": "SINGLE_FILE",
+          "path": "/etc/semantic-service/retrieval/profile.yaml",
+          "reload_policy": "HTTP_RELOAD",
+          "atomicity": "FULL"
+        }
+      ]
+    }
+  ]
+}
